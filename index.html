@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- status-tracker is MIT licensed: https://github.com/jasonmhead/status-tracker/blob/main/LICENSE -->
+        <!-- This app is built on startbootstrap's Bare starter template -->
+        <!-- Bare licensed MIT: https://github.com/startbootstrap/startbootstrap-bare/blob/master/LICENSE -->
+
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Site Feature Status</title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="css/styles.css" rel="stylesheet" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" integrity="sha384-EvBWSlnoFgZlXJvpzS+MAUEjvN7+gcCwH+qh7GRFOGgZO0PuwOFro7qPOJnLfe7l" crossorigin="anonymous">
+
+        <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    </head>
+    <body>
+        <!-- Responsive navbar-->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">Site Feature Status</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Home</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Page content-->
+        <div class="container">
+            <br>
+            First add a page, then add a category, and then a feature.
+            <br><br>
+            <input type="text" class="page-title-input" data-button="add-page-btn"> <button class="btn btn-success btn-sm add-page-btn add-page">Add Page <i class="bi bi-file-earmark"></i></button> 
+            <hr>
+            <h4><i class="bi bi-file-earmark"></i> Pages:</h4> <span class="page-links"></span>
+            <hr>
+            
+        </div>
+
+        <br>
+
+        <div class="container status-container"></div>
+        
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="js/scripts.js"></script>
+
+        <!-- Status core JS-->
+        <script>
+            function add_page() {
+                var page_title = $( ".page-title-input" ).val();
+                
+                if(page_title == ""){
+                    $( ".page-title-input" ).css('background','#ffcccc');
+                    return false;
+                }else{
+                    $( ".page-title-input" ).css('background','white');
+                }
+
+                $( ".page-title-input" ).val("");
+
+                var page_id = Math.floor(Math.random() * 100000000);
+                var page_container = '<a id="'+page_id+'" class="'+page_id+'"></a><div class="page-container '+page_id+'"><h2> <i class="bi bi-file-earmark"></i> '+page_title+' </h2> &nbsp; <input type="text" class="'+page_id+'-category-input" data-button="'+page_id+'-btn"> <button class="btn btn-success btn-sm '+page_id+'-btn add-feature-category" onclick="add_feature_category(\''+page_id+'\')">Add Feature Category <i class="bi bi-archive"></i></button> <button class="btn btn-danger btn-sm" data-id="'+page_id+'" onclick="remove_request('+page_id+')">Remove Page <i class="bi bi-file-earmark"></i></button> <span class="remove-'+page_id+'"></span> <br><br> <div class="page-feature-categories-'+page_id+'"></div> <hr class="'+page_id+'"></div>';
+                $( ".status-container" ).prepend(page_container);
+                $( ".page-links" ).prepend('<span class="page-link-span '+page_id+'"><i class="bi bi-file-earmark"></i> <a href="#'+page_id+'">'+page_title+'</a> &nbsp; | &nbsp;</span>');
+
+                write_status_file();
+            }
+
+            function add_feature_category(page_id) {
+                var page_category_title = $( "."+page_id+"-category-input" ).val();
+                
+                if(page_category_title == ""){
+                    $( "."+page_id+"-category-input" ).css('background','#ffcccc');
+                    return false;
+                }else{
+                    $( "."+page_id+"-category-input" ).css('background','white');
+                }
+
+                $( "."+page_id+"-category-input" ).val("");
+
+                var page_category_id = Math.floor(Math.random() * 100000000);
+
+                var feature_table = '\
+                    <table class="table table-striped status-table">\
+                    <thead>\
+                        <tr>\
+                        <th scope="col" class="feature">Feature</th>\
+                        <th scope="col" class="status">Status</th>\
+                        <th scope="col" class="change-status"></th>\
+                        <th scope="col" class="remove"></th>\
+                        </tr>\
+                    </thead>\
+                    <tbody class="features-'+page_category_id+'">\
+                    </tbody>\
+                </table>\
+                ';
+
+                var page_container = '<div class="page-category-container '+page_category_id+'"> &nbsp; &nbsp; &nbsp; <b><i class="bi bi-archive"></i> '+page_category_title+' </b> &nbsp; <input type="text" class="'+page_category_id+'-feature-input" size="50"  data-button="'+page_category_id+'-btn"> <button class="btn btn-success btn-sm feature-category '+page_category_id+'-btn" onclick="add_feature(\''+page_category_id+'\')">Add Feature <i class="bi bi-gear"></i></button> <button class="btn btn-danger btn-sm"  data-page-id="'+page_id+'" data-page-category-id="'+page_category_id+'" onclick="remove_request('+page_category_id+')">Remove Feature Category <i class="bi bi-archive"></i></button> <span class="remove-'+page_category_id+'"></span> '+feature_table+' </div>';
+                $( ".page-feature-categories-"+page_id ).prepend(page_container);
+
+                write_status_file();
+            }
+
+            function add_feature(page_category_id){
+
+                var feature_title = $( "."+page_category_id+"-feature-input" ).val();
+                
+                if(feature_title == ""){
+                    $( "."+page_category_id+"-feature-input" ).css('background','#ffcccc');
+                    return false;
+                }else{
+                    $( "."+page_category_id+"-feature-input" ).css('background','white');
+                }
+
+                $( "."+page_category_id+"-feature-input" ).val("");
+
+                var feature_id = Math.floor(Math.random() * 100000000);
+
+                var feature_row = '\
+                        <tr data-feature-id="'+feature_id+'" class="'+feature_id+'">\
+                            <td><i class="bi bi-gear"></i> '+feature_title+'</td>\
+                            <td class="feature-status-'+feature_id+'">Not Set</td>\
+                            <td><button class="btn btn-primary btn-sm change-status" onclick="change_status(\''+feature_id+'\')">Change Status</button></td>\
+                            <td><button class="btn btn-danger btn-sm" data-feature-id="'+feature_id+'" onclick="remove_request('+feature_id+')">Remove Feature <i class="bi bi-gear"></i></button> <span class="remove-'+feature_id+'"></span> </td>\
+                        </tr>\
+                        ';
+                $( ".features-"+page_category_id ).prepend(feature_row);
+
+                write_status_file();
+
+            }
+
+            function change_status(feature_id){
+
+                var feature_button_group = '\
+                <div class="btn-group" role="group">\
+                    <button type="button" class="btn btn-success btn-sm" onclick="status_update(\''+feature_id+'\',\'Working\',\'green\',\'emoji-smile\')" data-feature-id="'+feature_id+'><span class="working">Working</span></button>\
+                    <button type="button" class="btn btn-danger btn-sm" onclick="status_update(\''+feature_id+'\',\'Broken\',\'red\',\'emoji-frown\')" data-feature-id="'+feature_id+'><span class="broken">Broken</span></button>\
+                ';
+
+                $( ".feature-status-"+feature_id ).html(feature_button_group);
+            }
+
+            function status_update(feature_id, status_text, text_color, icon){
+                var status_html = '<span class="'+status_text+'" style="color:'+text_color+'">'+status_text+' <i class="bi bi-'+icon+'"></i></span>'
+                $( ".feature-status-"+feature_id ).html(status_html);
+
+                write_status_file();
+            }
+
+            function remove_request(element_id){
+                var remove_button_group = '\
+                <div class="btn-group" role="group">\
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="cancel(\''+element_id+'\')"><span>Cancel</span></button>\
+                    <button type="button" class="btn btn-danger btn-sm" onclick="remove(\''+element_id+'\')"><span>Remove</span></button>\
+                ';
+
+                $( ".remove-"+element_id ).html(remove_button_group);
+
+            }
+
+            function remove(element_id){
+                $( "."+element_id ).remove();
+
+                write_status_file();
+            }
+
+            function cancel(element_id){
+                $( ".remove-"+element_id ).html("");
+            }
+
+            function write_status_file(){
+                // for simplicity just grab the html in page-links and status-container
+                var links_html = $( ".page-links" ).html();
+                var status_html = $( ".status-container" ).html();
+                $.post( "write_status_file.php", { links_html: links_html, status_html: status_html, action: "write" })
+                    .done(function( data ) {
+                    console.log( "Data post response: "+data );
+                });
+            }
+
+            function load_status_file(){
+                $.post( "write_status_file.php", { action: "read" })
+                    .done(function( data ) {
+                        html_data_json = $.parseJSON(data);
+                        $( ".page-links" ).html(html_data_json[0]);
+                        $( ".status-container" ).html(html_data_json[1]);
+                });
+            }
+
+            $( document ).ready(function() {
+                $( ".add-page" ).on( "click", add_page );
+                load_status_file();
+
+                // return key functionality for text fields
+                $(document).on('keypress', function(e){
+                    if(e.which == 13){
+                        var focused_element = $(':focus');
+                        $('.'+focused_element.attr('data-button')).click();
+                    }
+                });
+            });
+
+        </script>
+
+    </body>
+</html>
